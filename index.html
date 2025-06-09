@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Ruthless Elimination of Hurry - Reader</title>
+  <script src="https://unpkg.com/epubjs/dist/epub.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Text&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      margin: 0;
+      font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f7f8fa;
+    }
+
+    #viewer {
+      flex: 3;
+      height: 100vh;
+      border-right: 1px solid #e0e0e0;
+    }
+
+    #sidebar {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      background-color: #ffffff;
+      box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+      overflow-y: auto;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #333;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+
+    textarea, input {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-family: inherit;
+    }
+
+    ul#taskList {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul#taskList li {
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #f0f0f0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    ul#taskList li span {
+      flex-grow: 1;
+      margin-left: 10px;
+    }
+
+    ul#taskList li.completed {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .highlight {
+      background-color: yellow;
+    }
+
+    .task-checkbox {
+      transform: scale(1.3);
+    }
+  </style>
+</head>
+<body>
+  <div id="viewer"></div>
+  <div id="sidebar">
+    <h2>Notes</h2>
+    <textarea id="notes" placeholder="Type your notes here..."></textarea>
+
+    <h2>Tasks</h2>
+    <input type="text" id="taskInput" placeholder="New task..." />
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const book = ePub("TheRuthlessElimination.epub"); // Make sure this filename matches your EPUB file
+    const rendition = book.renderTo("viewer", {
+      width: "100%",
+      height: "100%"
+    });
+    rendition.display();
+
+    // Highlight selected text
+    rendition.on("selected", function(cfiRange, contents) {
+      rendition.annotations.highlight(cfiRange, {}, () => {}, "highlight", {
+        fill: "yellow",
+        "fill-opacity": "0.5",
+        "mix-blend-mode": "multiply"
+      });
+    });
+
+    // Task management
+    const taskInput = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
+
+    taskInput.addEventListener("keypress", function(e) {
+      if (e.key === "Enter" && taskInput.value.trim() !== "") {
+        const li = document.createElement("li");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "task-checkbox";
+        const span = document.createElement("span");
+        span.textContent = taskInput.value;
+
+        checkbox.addEventListener("change", function () {
+          li.classList.toggle("completed", checkbox.checked);
+        });
+
+        li.appendChild(checkbox);
+        li.appendChild(span);
+        taskList.appendChild(li);
+        taskInput.value = "";
+      }
+    });
+  </script>
+</body>
+</html>
